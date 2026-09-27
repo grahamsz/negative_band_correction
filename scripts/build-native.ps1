@@ -19,7 +19,7 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Rust library build failed' }
     $out = Join-Path $bandingRoot 'target\native'
     New-Item -ItemType Directory -Path $out -Force | Out-Null
-    $addon = Join-Path $out 'banding-v010.uxpaddon'
+    $addon = Join-Path $out 'banding-v020.uxpaddon'
     $rustLib = Join-Path $bandingRoot 'target\x86_64-pc-windows-msvc\release\banding.lib'
     & cl.exe /nologo /LD /MT /O2 /EHsc /std:c++17 /W4 /DWIN32_LEAN_AND_MEAN /DNOMINMAX "/I$bandingSdk\src\utilities" "/I$bandingSdk\src\api" "/Fo$out\addon.obj" 'native\addon.cpp' $rustLib /link "/OUT:$addon" /INCREMENTAL:NO /OPT:REF /OPT:ICF /DYNAMICBASE /NXCOMPAT ws2_32.lib userenv.lib bcrypt.lib ntdll.lib advapi32.lib kernel32.lib
     if ($LASTEXITCODE -ne 0) { throw 'Native addon link failed' }

@@ -207,6 +207,15 @@ impl Analysis {
             if index.is_some_and(|i| k > i) {
                 break;
             }
+            // Average fitted envelope, excluding truly undetected nodes. This
+            // stays independent of source brightness and sine phase.
+            let positive: Vec<_> = component
+                .spatial
+                .iter()
+                .copied()
+                .filter(|&a| a > 0.0)
+                .collect();
+            let fallback = positive.iter().sum::<f64>() / positive.len().max(1) as f64;
             let band_bound: f64 = self
                 .pure
                 .components
@@ -269,14 +278,28 @@ impl Analysis {
                     };
                     // Round the safety floor upward so quantization cannot
                     // undermine the bound. No sine phase enters this bound.
-                    let mask =
-                        quantize(desired).max((reserve.clamp(0.0, 1.0) * 32768.0).ceil() as u16);
+                    let local = applicability as f64 / 32768.0;
+                    let ratio = if fallback > 0.0 {
+                        (local / fallback).min(1.0)
+                    } else {
+                        1.0
+                    };
+                    // Scale only by the smooth envelope, never by wave phase.
+                    // Retain the conservative clipping reserve for nonzero fits.
+                    let mask = if applicability == 0 {
+                        0
+                    } else {
+                        quantize(desired * ratio)
+                            .max((reserve.clamp(0.0, 1.0) * 32768.0).ceil() as u16)
+                    };
                     let weight = c.compact_opacity * mask as f64 / 32768.0;
                     let carrier_pixel = quantize(
                         0.5 + if weight > 0.0 {
                             0.5 * (target - base) / weight
                         } else {
-                            0.0
+                            -0.5 * component.carrier_gain
+                                * local.max(fallback)
+                                * (TAU * component.frequency * x as f64 + component.phase).cos()
                         },
                     );
                     let full = (base + 2.0 * carrier_pixel as f64 / 32768.0 - 1.0).clamp(0.0, 1.0);
@@ -493,6 +516,34 @@ mod tests {
     use super::*;
     use crate::layer_tests::fixture;
     #[test]
+    fn fallback_wave_survives_zero_fit_and_black_density_mask() {
+        let (mut analysis, raw) = fixture(1, 0.5, 1.0);
+        analysis.config.compact_opacity = 168.0 / 255.0;
+        let c = &mut analysis.pure.components[0];
+        let width = analysis.config.width;
+        for row in c.spatial.chunks_mut(width) {
+            for value in &mut row[..width / 2] {
+                *value = 0.0;
+            }
+        }
+        let cancel = AtomicBool::new(false);
+        for source in [
+            raw,
+            vec![65535; analysis.config.width * analysis.config.height],
+        ] {
+            let (tile, _) = analysis
+                .render_compact(Some(0), &source, 0, &cancel)
+                .unwrap();
+            let tile = tile.unwrap();
+            assert!(
+                tile.pixels[..width / 2]
+                    .iter()
+                    .any(|&v| v.abs_diff(16384) > 10)
+            );
+            assert!(tile.mask[..width / 2].iter().all(|&v| v == 0));
+        }
+    }
+    #[test]
     fn band_free_density_mask_does_not_follow_the_wave_phase() {
         let (mut analysis, raw) = fixture(1, 0.5, 1.0);
         analysis.config.compact_opacity = 168.0 / 255.0;
@@ -634,7 +685,7 @@ mod tests {
                     .0
                     .unwrap();
                 assert_ne!(original.pixels, altered.pixels);
-                assert!(protected.pixels.iter().all(|&v| v == 16384));
+                assert!(protected.pixels.iter().any(|&v| v != 16384));
                 assert_ne!(original.mask, altered.mask);
                 assert!(protected.mask.iter().all(|&v| v == 0));
             }

@@ -1,7 +1,7 @@
 # Negative Band Correction for Photoshop
 
 A Photoshop UXP panel backed by its own bundled Rust correction engine.
-Version 0.1 has one output: **locally fitted waves with density masks and residual
+Version 0.2 has one output: **locally fitted waves with density masks and residual
 refinement**. Layer pixels contain fitted waves, local amplitude, and image-dependent blend compensation. The editable mask uses estimated debanded density.
 
 One detected component creates one Linear Light pixel layer and one mask.
@@ -13,7 +13,7 @@ fitted correction at 100%, subject to clipping. Keep Fill at 100%.
 ## Install
 
 1. Unload an older development version in UXP Developer Tool, if loaded.
-2. Install `dist/negative-band-correction-0.1.0-win-x64.ccx` through Creative Cloud.
+2. Install `dist/negative-band-correction-0.2.0-all-platforms.ccx` through Creative Cloud.
 3. Open **Plugins > Negative Band Correction** in Photoshop 25 or newer.
 4. Open a 16-bit RGB or grayscale negative and select exactly one opaque, full-canvas image layer.
 5. Click **Create correction layer**. Save as PSD/PSB to retain editable layers.
@@ -57,7 +57,7 @@ See [build and CI setup](docs/build-and-ci.md) for the SDK settings,
 development artifacts, and optional macOS signing/notarization.
 The local CCX is Windows-only; the first macOS CI/host run is still pending.
 
-Version 0.1 uses stronger inverse-phase backoff, up to eight refinement steps,
+Version 0.2 uses stronger inverse-phase backoff, up to eight refinement steps,
 and local held-row guards against newly overcorrected patches. The editable
 mask and 66% starting opacity are unchanged.
 
@@ -130,3 +130,7 @@ The bundled crate owns detection, residual refinement, full-precision TIFF math,
 and quantized layer/mask rendering. `src/native.rs` handles Photoshop jobs and
 the C ABI; `native/addon.cpp` adapts it to UXP.
 See [provenance](UPSTREAM.md) and [CI setup](docs/build-and-ci.md).
+
+## 0.2: Paintable fallback waves
+
+Masked-out areas retain a sinusoid using the mean positive fitted envelope for that component. Weak local envelopes transfer more attenuation into the editable mask. The default correction remains matched to the fitted target within 16-bit rounding, and initial layer opacity remains 66%. Painting white into a gap reveals the fallback wave. Clipping safety can limit amplification in extreme tones.

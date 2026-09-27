@@ -23,7 +23,7 @@ el("apply").addEventListener("click",async()=>{
 (async()=>{
     busy(true);status("Loading engine...");
     try {
-        client=createNativeClient(await require("banding-v010.uxpaddon"));
+        client=createNativeClient(await require("banding-v020.uxpaddon"));
         const health=await client("/health");
         if(health.service!=="photoshop-banding" || health.protocol!==1) throw new Error("Incompatible bundled Rust engine.");
         status("Select an image layer to begin.");

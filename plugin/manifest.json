@@ -2,10 +2,10 @@
   "manifestVersion": 6,
   "id": "dev.graham.photoshop-banding",
   "name": "Negative Band Correction",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "main": "index.html",
   "host": { "app": "PS", "minVersion": "25.0.0", "data": { "apiVersion": 2 } },
-  "addon": { "name": "banding-v010.uxpaddon" },
+  "addon": { "name": "banding-v020.uxpaddon" },
   "icons": [{ "width": 48, "height": 48, "path": "icons/banding-48.png", "scale": [1, 2] }],
   "entrypoints": [{
     "type": "panel", "id": "banding", "label": { "default": "Negative Band Correction" },

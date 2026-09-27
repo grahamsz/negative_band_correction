@@ -14,7 +14,7 @@ function startPanel(addon) {
     const finished=vm.runInNewContext(source,{
         document:{getElementById:element},
         require:name=>{
-            if(name==="banding-v010.uxpaddon") return addon;
+            if(name==="banding-v020.uxpaddon") return addon;
             if(name==="./native-client.js") return require("../plugin/native-client.js");
             if(name==="./workflow.js") return {};
             if(name==="photoshop" || name==="uxp") return {};
