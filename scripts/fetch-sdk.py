@@ -13,7 +13,8 @@ def main():
     if not url.startswith("https://") or len(digest) != 64:
         raise ValueError("Configure UXP_SDK_URL (HTTPS secret) and UXP_SDK_SHA256 (repository variable)")
     try:
-        with urllib.request.urlopen(url, timeout=120) as response:
+        request = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (compatible; BandingBuild/1.0)"})
+        with urllib.request.urlopen(request, timeout=120) as response:
             data = response.read()
     except Exception:
         # Do not expose a signed download URL in Actions logs.
