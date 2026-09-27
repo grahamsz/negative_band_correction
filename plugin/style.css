@@ -1,0 +1,18 @@
+* { box-sizing: border-box; }
+body { width: 100%; max-width: 100%; margin: 0; padding: 16px; color: var(--uxp-host-text-color); font-size: 13px; }
+.settings { padding: 0; }
+h2 { font-size: 19px; margin: 0 0 8px; }
+p { margin: 6px 0 12px; line-height: 1.4; }
+.intro { margin-bottom: 8px; }
+#status { min-height: 36px; margin: 0 0 12px; font-size: 12px; }
+label { display: flex; flex-direction: row; align-items: center; margin: 0 0 10px; min-height: 28px; }
+label span { flex: 1 1 auto; margin-right: 10px; }
+label input { min-width: 0; flex: 0 0 90px; width: 90px; margin: 0; }
+label.roi input { flex-basis: 148px; width: 148px; }
+.hint { opacity: 0.75; font-size: 11px; }
+.detection { margin-top: 16px; padding-top: 12px; border-top: 1px solid rgba(128,128,128,0.4); }
+h3 { font-size: 13px; margin: 0 0 6px; }
+#detected { margin: 0 0 6px; }
+#resolution { margin-bottom: 12px; }
+.actions { padding-top: 8px; }
+.actions button { display: block; width: 100%; margin: 0; }

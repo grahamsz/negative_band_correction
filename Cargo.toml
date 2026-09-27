@@ -1,0 +1,26 @@
+[package]
+name = "photoshop-banding"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.88"
+license = "MIT OR Apache-2.0"
+description = "Editable Photoshop band correction with a bundled Rust engine"
+
+[workspace]
+members = ["crates/negative-banding"]
+resolver = "3"
+
+[lib]
+name = "banding"
+crate-type = ["rlib", "staticlib", "cdylib"]
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"
+negative-banding = { version = "0.1.0", path = "crates/negative-banding" }
+tempfile = "3"
+
+[profile.release]
+lto = "thin"
+codegen-units = 1

@@ -1,0 +1,10 @@
+/target/
+/dist/
+connection.json
+*.log
+
+
+/plugin/win/
+/plugin/mac/
+/addon.lib
+/addon.exp

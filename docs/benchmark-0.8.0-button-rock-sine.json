@@ -1,0 +1,29 @@
+{
+  "file": "button_rock_003.tif",
+  "shape": [
+    21920,
+    16912,
+    1
+  ],
+  "tile_rows": 661,
+  "output": "pure_waves_combined_mask_refined",
+  "waveform": "sine",
+  "checks": {
+    "carrier_first_last_rows_identical": true,
+    "carrier_analytic_max_difference_native": 0,
+    "native_blend_max_difference": 0,
+    "layer_count": 1,
+    "effective_opacity": 0.6588235294117647
+  },
+  "read_tiff_s": 0.6247777999960817,
+  "capture_s": 0.3185656999994535,
+  "fit_s": 3.226534899993567,
+  "render_s": 2.5148563999973703,
+  "native_total_s": 6.059956999990391,
+  "output_bytes": 1482844160,
+  "periods": [
+    [
+      815.4729690018092
+    ]
+  ]
+}
