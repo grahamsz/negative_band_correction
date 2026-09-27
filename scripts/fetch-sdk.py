@@ -29,7 +29,13 @@ def main():
             if not target.is_relative_to(destination):
                 raise ValueError("SDK archive contains an unsafe path")
         archive.extractall(destination)
-    headers = list(destination.rglob("src/api/UxpAddonShared.h"))
+    # Samples embed their own API headers; select the outer SDK root.
+    headers = sorted(destination.rglob("src/api/UxpAddonShared.h"),
+                     key=lambda path: len(path.relative_to(destination).parts))
+    if headers:
+        depth = len(headers[0].relative_to(destination).parts)
+        headers = [path for path in headers
+                   if len(path.relative_to(destination).parts) == depth]
     if len(headers) != 1:
         raise ValueError("SDK archive must contain one src/api/UxpAddonShared.h")
     sdk_root = headers[0].parents[2]
