@@ -1,7 +1,8 @@
 # Negative Band Correction for Photoshop
 
 **[Download Negative Band Correction 0.2 — CCX installer](https://github.com/grahamsz/negative_band_correction/releases/download/0.2/negative-band-correction-0.2.0-all-platforms.ccx)**
-**[YouTube Video Demo](https://www.youtube.com/watch?v=mNi-jrepSeo)
+
+**[YouTube Video Demo](https://www.youtube.com/watch?v=mNi-jrepSeo)**
 
 One download includes Windows x64, Intel Mac, and Apple Silicon. Requires Photoshop 25 or newer. Mac builds are currently for testing: they are not Developer ID signed or notarized and may require developer loading and macOS security approval.
 
