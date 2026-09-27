@@ -22,17 +22,18 @@ An expiring download URL must be refreshed when it expires. Obtain the SDK from
 the Adobe Developer Console and host it privately under your Adobe license.
 The workflow does not upload or redistribute the SDK.
 
-Native jobs build and ABI-smoke-test each architecture separately. The workflow
-uploads `plugin-windows-x64`, `plugin-macos-arm64`, `plugin-macos-x64`, and a merged
-`plugin-all-platforms` artifact. Downloads contain the panel and its addon(s),
-ready for **Add Plugin** in UXP Developer Tool. They are development bundles,
-not installable CCX files. CI neither opens Photoshop nor proves host behavior.
-Pull requests never receive SDK or signing secrets.
+Native jobs build and ABI-smoke-test each architecture separately. The final
+job combines Windows x64, Mac Intel, and Mac Apple Silicon into one
+`negative-band-correction-<version>-all-platforms.ccx`, using Adobe's packager.
+Download the `negative-band-correction-all-platforms-ccx` Actions artifact and
+extract the CCX to install it. Packaging checks that all three native binaries
+are present and unchanged. Platform development bundles remain available too.
 
-For an installable multi-platform CCX, load the combined artifact's manifest in
-Adobe UXP Developer Tool and choose **Package**. The current local Windows script
-also uses Adobe's packager and produces a Windows CCX. Do not rename a development
-ZIP to CCX and treat it as a validated installer.
+Unsigned Mac builds are for local testing; production Mac distribution requires
+the signing option below. CI does not open Photoshop or prove host behavior.
+Tag pushes also create a GitHub prerelease and attach the combined CCX.
+For example, tag `0.1` corresponds to plugin version `0.1.0`.
+Pull requests never receive SDK or signing secrets.
 
 ## macOS signing for distribution
 

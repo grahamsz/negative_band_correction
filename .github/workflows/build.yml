@@ -46,7 +46,7 @@ jobs:
   native:
     needs: test
     # SDK/signing secrets are never provided to pull-request builds.
-    if: github.event_name != 'pull_request' && (inputs.native == true || vars.UXP_NATIVE_BUILDS == 'true')
+    if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/') || inputs.native == true || vars.UXP_NATIVE_BUILDS == 'true')
     strategy:
       fail-fast: false
       matrix:
@@ -119,15 +119,81 @@ jobs:
           if-no-files-found: error
   combined:
     needs: native
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
       - uses: actions/download-artifact@v4
         with:
           pattern: plugin-*
           merge-multiple: true
-          path: plugin
+          path: dist/plugin
+      - name: Install Adobe packaging tools
+        run: npm install --prefix packaging-tools --ignore-scripts --no-audit --no-fund @adobe/uxp-devtools-core@1.2.0
+      - name: Package Windows and both Mac architectures in one CCX
+        shell: pwsh
+        env:
+          REQUIRE_ALL_PLATFORMS: 'true'
+        run: |
+          $env:UXP_PACKAGING_CORE=Join-Path $PWD 'packaging-tools/node_modules/@adobe/uxp-devtools-core'
+          node scripts/package-ccx.js
+          if ($LASTEXITCODE -ne 0) {throw 'CCX packaging failed'}
+      - name: Verify all native binaries are included unchanged
+        shell: pwsh
+        run: |
+          Add-Type -AssemblyName System.IO.Compression.FileSystem
+          $manifest=Get-Content -Raw dist/plugin/manifest.json | ConvertFrom-Json
+          $ccx=Get-Item "dist/negative-band-correction-*-all-platforms.ccx"
+          $zip=[IO.Compression.ZipFile]::OpenRead($ccx.FullName)
+          try {
+            foreach($platform in @('win/x64','mac/x64','mac/arm64')) {
+              $name="$platform/$($manifest.addon.name)"
+              $entry=$zip.GetEntry($name)
+              if (!$entry) {throw "Missing $name"}
+              $stream=$entry.Open()
+              try {
+                $hash=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($stream))
+                if($hash -ne (Get-FileHash "dist/plugin/$name").Hash) {throw "Binary changed: $name"}
+              } finally {$stream.Dispose()}
+            }
+          } finally {$zip.Dispose()}
       - uses: actions/upload-artifact@v4
         with:
-          name: plugin-all-platforms
-          path: plugin/
+          name: negative-band-correction-all-platforms-ccx
+          path: dist/negative-band-correction-*-all-platforms.ccx
           if-no-files-found: error
+  release:
+    needs: combined
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: negative-band-correction-all-platforms-ccx
+          path: release
+      - name: Publish tagged release with combined installer
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        shell: bash
+        run: |
+          cat > release-notes.md <<'EOF'
+          One CCX containing Windows x64, macOS Intel, and macOS Apple Silicon addons.
+
+          Download the CCX below and install it through Creative Cloud.
+          Mac addons are ad-hoc signed for testing, not Developer ID signed or notarized;
+          local developer loading and macOS security approval may be required.
+          Photoshop 25 or newer is required. Host testing on both Mac architectures remains outstanding.
+          EOF
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" release/*.ccx --clobber
+          else
+            gh release create "$RELEASE_TAG" release/*.ccx --verify-tag --prerelease --title "Negative Band Correction $RELEASE_TAG" --notes-file release-notes.md
+          fi

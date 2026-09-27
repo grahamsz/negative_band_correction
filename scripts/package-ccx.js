@@ -18,12 +18,23 @@ for(const name of ["manifest.json","index.html","style.css","main.js","workflow.
 fs.mkdirSync(path.join(staging,"icons"));
 for(const name of fs.readdirSync(path.join(plugin,"icons")))
     fs.copyFileSync(path.join(plugin,"icons",name),path.join(staging,"icons",name));
-fs.mkdirSync(path.join(staging,"win/x64"),{recursive:true});
-fs.copyFileSync(path.join(plugin,"win/x64",addon),path.join(staging,"win/x64",addon));
+for(const platform of ["win/x64","mac/x64","mac/arm64"]) {
+    const binary=path.join(plugin,platform,addon);
+    if(!fs.existsSync(binary)) {
+        if(process.env.REQUIRE_ALL_PLATFORMS==="true") throw new Error("Missing native addon: "+platform);
+        continue;
+    }
+    fs.mkdirSync(path.join(staging,platform),{recursive:true});
+    fs.copyFileSync(binary,path.join(staging,platform,addon));
+}
 const command=new PackageCommand({}, {manifest:path.join(staging,"manifest.json"),packageDir:output,apps:["PS"]});
 command.package().then(results=>{
     for(const result of results) if(!result.success)throw result.error;
-    console.log("Packaged with Adobe UXP Developer Tool: "+path.join(output,JSON.parse(fs.readFileSync(manifest)).id+"_PS.ccx"));
+    const info=JSON.parse(fs.readFileSync(manifest));
+    const ccx=path.join(output,info.id+"_PS.ccx");
+    if(process.env.REQUIRE_ALL_PLATFORMS==="true")
+        fs.copyFileSync(ccx,path.join(output,"negative-band-correction-"+info.version+"-all-platforms.ccx"));
+    console.log("Packaged with Adobe's UXP packager: "+ccx);
     console.log("Offline package validation passed. Verify installation and native loading in Photoshop before release.");
 }).catch(error=>{console.error(error);process.exitCode=1;})
     .finally(()=>fs.rmdirSync(staging,{recursive:true}));
