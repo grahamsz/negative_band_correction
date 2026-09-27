@@ -11,8 +11,7 @@ the Photoshop copy's carrier normalization: a lower default amplitude makes
 combined masks more visible, with a density-range guard and regression tests.
 The detector originated in epscan;
 residual refinement and the pure-sine layer renderer originated in
-photoshop-banding. Both projects are dual-licensed MIT OR Apache-2.0, and the
-engine retains those licenses and source notices.
+photoshop-banding. The plugin uses the AGPL-3.0 license in LICENSE. The imported engine retains its MIT OR Apache-2.0 licenses and source notices, consolidated in THIRD_PARTY_NOTICES.md.
 
 The earlier vendored detector had SHA-256
 `E1967E8D9D2C4853817FC770A35DD095A54263B33458EF6B7EE0AD6C51EED366`.

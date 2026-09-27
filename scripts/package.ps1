@@ -31,7 +31,7 @@ foreach($obsolete in @('client.js','pure-stack.js')) {
     $obsoletePath=Join-Path $bundle $obsolete
     if(Test-Path -LiteralPath $obsoletePath) {Remove-Item -LiteralPath $obsoletePath}
 }
-foreach ($name in @('LICENSE-MIT','LICENSE-APACHE','UPSTREAM.md')) {
+foreach ($name in @('LICENSE','THIRD_PARTY_NOTICES.md','UPSTREAM.md')) {
     Copy-Item -LiteralPath (Join-Path $bandingRoot $name) -Destination $bundle -Force
 }
 Copy-Item -LiteralPath (Join-Path $bandingRoot 'README.md') -Destination $bandingDist -Force

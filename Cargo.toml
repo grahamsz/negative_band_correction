@@ -3,7 +3,7 @@ name = "photoshop-banding"
 version = "0.2.0"
 edition = "2024"
 rust-version = "1.88"
-license = "MIT OR Apache-2.0"
+license = "AGPL-3.0-only"
 description = "Editable Photoshop band correction with a bundled Rust engine"
 
 [workspace]

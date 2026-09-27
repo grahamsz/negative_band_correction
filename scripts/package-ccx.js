@@ -13,7 +13,7 @@ if(!fs.existsSync(path.join(plugin,"win/x64",addon)))throw new Error("Build the 
 // Loaded historical addons can be locked in the development bundle. Package
 // only the current manifest's addon and the supported panel files.
 const staging=fs.mkdtempSync(path.join(os.tmpdir(),"banding-package-"));
-for(const name of ["manifest.json","index.html","style.css","main.js","workflow.js","native-client.js","compact-stack.js","LICENSE-MIT","LICENSE-APACHE","UPSTREAM.md"])
+for(const name of ["manifest.json","index.html","style.css","main.js","workflow.js","native-client.js","compact-stack.js","LICENSE","THIRD_PARTY_NOTICES.md","UPSTREAM.md"])
     fs.copyFileSync(path.join(plugin,name),path.join(staging,name));
 fs.mkdirSync(path.join(staging,"icons"));
 for(const name of fs.readdirSync(path.join(plugin,"icons")))
