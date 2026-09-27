@@ -1,5 +1,9 @@
 # Negative Band Correction for Photoshop
 
+**[Download Negative Band Correction 0.2 — CCX installer](https://github.com/grahamsz/negative_band_correction/releases/download/0.2/negative-band-correction-0.2.0-all-platforms.ccx)**
+
+One download includes Windows x64, Intel Mac, and Apple Silicon. Requires Photoshop 25 or newer. Mac builds are currently for testing: they are not Developer ID signed or notarized and may require developer loading and macOS security approval.
+
 A Photoshop UXP panel backed by its own bundled Rust correction engine.
 Version 0.2 has one output: **locally fitted waves with density masks and residual
 refinement**. Layer pixels contain fitted waves, local amplitude, and image-dependent blend compensation. The editable mask uses estimated debanded density.
@@ -12,18 +16,20 @@ fitted correction at 100%, subject to clipping. Keep Fill at 100%.
 
 ## Install
 
-1. Unload an older development version in UXP Developer Tool, if loaded.
-2. Install `dist/negative-band-correction-0.2.0-all-platforms.ccx` through Creative Cloud.
-3. Open **Plugins > Negative Band Correction** in Photoshop 25 or newer.
+1. [Download the CCX installer](https://github.com/grahamsz/negative_band_correction/releases/download/0.2/negative-band-correction-0.2.0-all-platforms.ccx).
+2. **Double-click the downloaded .ccx file** and follow the Creative Cloud installation prompts.
+3. Open **Plugins > Negative Band Correction** in Photoshop.
 4. Open a 16-bit RGB or grayscale negative and select exactly one opaque, full-canvas image layer.
 5. Click **Create correction layer**. Save as PSD/PSB to retain editable layers.
 
-The Windows x64 package includes its Rust engine and runtime. Users do not need
-Rust, the SDK, a helper application, a localhost connection, or Developer Mode.
-For development, load `dist/plugin/manifest.json` with UXP Developer Tool; Unload
-then Load after updating the native binary. Restart Photoshop if it retains the
-previous binary.
+The installer includes the native Rust engine. Normal installation does not require
+Rust, the SDK, UXP Developer Tool, a helper application, or Developer Mode.
+The current unsigned Mac build has the testing limitations noted above.
 
+If you previously loaded a development copy through UXP Developer Tool, unload
+that copy before installing the CCX. For development, load
+`dist/plugin/manifest.json` with UXP Developer Tool. Restart Photoshop if it
+retains a previous native binary after updating.
 The operation reads only the selected layer by ID and is one Undo. Correction layers are placed directly above it and clipped to it. Select the original image layer when fitting again. Photoshop's progress dialog can
 cancel the operation. The plugin does not automatically remove existing layers.
 
@@ -55,7 +61,7 @@ ported explicitly between the projects without coordinating their releases.
 GitHub Actions tests and builds Windows x64, macOS Intel, and Apple Silicon.
 See [build and CI setup](docs/build-and-ci.md) for the SDK settings,
 development artifacts, and optional macOS signing/notarization.
-The local CCX is Windows-only; the first macOS CI/host run is still pending.
+The downloadable CCX includes all three architectures. CI builds and package checks passed on all three; Photoshop host testing on both Mac architectures remains outstanding.
 
 Version 0.2 uses stronger inverse-phase backoff, up to eight refinement steps,
 and local held-row guards against newly overcorrected patches. The editable
