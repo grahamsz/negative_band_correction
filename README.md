@@ -35,7 +35,7 @@ cancel the operation. The plugin does not automatically remove existing layers.
 
 ## Creative Cloud says "Compatible app required"
 
-On a machine with only Photoshop Beta 27.12 installed, the 0.9.0 CCX was rejected
+On a machine with only Photoshop Beta 27.12 installed, the 0.2.0 CCX was rejected
 by Creative Cloud and by Adobe's UPIA command-line installer (status `-411`,
 no compatible installed product). The manifest requires Photoshop 25 or newer;
 Beta exceeds that version, but the installer does not accept this installation.
@@ -53,7 +53,6 @@ and [developer reports of Beta-only installation failures](https://forums.creati
 
 ## Standalone engine and cross-platform builds
 
-The sine is the only waveform; the harmonic experiments have been removed.
 The engine lives in `crates/negative-banding` inside this repository. No epscan
 checkout is required. epscan retains an independent backport; changes can be
 ported explicitly between the projects without coordinating their releases.
@@ -78,7 +77,7 @@ mask and 66% starting opacity are unchanged.
 - **Detection region** optionally takes `X0,X1,Y0,Y1`, half-open full-resolution
   coordinates. It limits frequency learning, not the corrected area.
 
-Frequencies are learned in pixels; DPI does not impose a 4.25 mm period. Run on
+Frequencies are learned in pixels; DPI does not impose a 4.3 mm period. Run on
 the original negative before inversion, creative curves, resizing, or rotation.
 Alt-click the mask to inspect it, or paint it to adjust local applicability.
 
@@ -137,6 +136,3 @@ and quantized layer/mask rendering. `src/native.rs` handles Photoshop jobs and
 the C ABI; `native/addon.cpp` adapts it to UXP.
 See [provenance](UPSTREAM.md) and [CI setup](docs/build-and-ci.md).
 
-## 0.2: Paintable fallback waves
-
-Masked-out areas retain a sinusoid using the mean positive fitted envelope for that component. Weak local envelopes transfer more attenuation into the editable mask. The default correction remains matched to the fitted target within 16-bit rounding, and initial layer opacity remains 66%. Painting white into a gap reveals the fallback wave. Clipping safety can limit amplification in extreme tones.
